@@ -1,0 +1,9 @@
+export { default as LoginPage } from "./Login";
+export { default as SignupPage } from "./SignUp";
+export { default as JobDetailsPage } from "./JobDetail";
+export { default as JobPage } from "./Jobs";
+export { default as ErrorPage } from "./Error";
+export { default as Dashboard } from "./Dashboard";
+export { default as HomePage } from "./HomePage";
+export { default as LayoutPage } from "./Layout";
+export { default as SingleErrorPage } from "./SingleError";
