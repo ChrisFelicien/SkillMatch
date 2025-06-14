@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import generateTokenAndSendResponse from "../utils/generateTokenSendResponse.js";
 import AppError from "../utils/AppError.js";
+import Token from "../models/Token.js";
 
 // prevent if req.body is falsy
 export const isReqBodyValid = (req, res, next) => {
@@ -51,12 +52,28 @@ export const loginUser = asyncHandler(async (req, res, next) => {
   generateTokenAndSendResponse(res, user, 200);
 });
 
-export const logoutUser = (req, res, next) => {
+export const logoutUser = async (req, res, next) => {
+  await Token.findOneAndDelete({ user: req.user._id });
   res.clearCookie("token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict"
   });
+
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: true,
+    maxAge: 7 * 24 * 60 * 60 * 1000 //Expire in 7days
+  });
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: true,
+    maxAge: 7 * 24 * 60 * 60 * 1000 //Expire in 7days
+  });
+
   res.status(200).json({
     status: "success",
     message: "disconnected"
@@ -64,36 +81,58 @@ export const logoutUser = (req, res, next) => {
 };
 
 export const protect = asyncHandler(async (req, res, next) => {
-  let token;
-
-  if (
-    req.cookies &&
-    req.cookies.token &&
-    req.cookies.token.startsWith("Bearer")
-  ) {
-    token = req.cookies.token.split(" ")[1];
-  }
+  const token = req.cookies.token;
 
   if (!token) {
     return next(new AppError(`Seems like you are not logged in`, 401));
   }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
 
-  const user = await User.findById(decoded.id);
+    if (!user) return next(new AppError("No user find", 404));
 
-  // is password has been changed after the jwt was issued
-  const passwordChangedAfter = user.passwordChangedAfter(decoded.iat);
+    // is password has been changed after the jwt was issued
+    const passwordChangedAfter = user.passwordChangedAfter(decoded.iat);
 
-  if (passwordChangedAfter) {
-    return next(
-      new AppError(`Seems like your password was changed login again`, 400)
-    );
+    if (passwordChangedAfter) {
+      return next(
+        new AppError(`Seems like your password was changed login again`, 400)
+      );
+    }
+
+    req.user = user;
+
+    next();
+  } catch (error) {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) return next(new AppError("Expired token", 401));
+
+    const tokenDoc = await Token.findOne({ refreshToken });
+    if (!tokenDoc) return next(new AppError("Refresh token invalid", 403));
+
+    try {
+      const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.id);
+      if (!user) return next(new AppError(`No user find`, 404));
+
+      const newToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRE_AT
+      });
+      res.cookie("token", newToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 15 * 60 * 1000
+      });
+      req.user = user;
+      next();
+    } catch (error) {
+      return next(new AppError("Refresh token expired", 403));
+    }
   }
-
-  req.user = user;
-
-  next();
 });
 
 export const changeUserPassword = asyncHandler(async (req, res, next) => {
