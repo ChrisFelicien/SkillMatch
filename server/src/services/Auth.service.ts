@@ -13,6 +13,25 @@ type IRegisterData = Partial<
 
 type ILoginData = Partial<Pick<IUser, 'email' | 'password'>>;
 
+const generateUserSession = async (user: IUser) => {
+  const accessToken = generateAccessToken({
+    userId: user._id,
+    role: user.role,
+  });
+  const refreshToken = generateRefreshToken({
+    userId: user._id,
+    role: user.role,
+  });
+
+  await RefreshToken.create({
+    userId: user._id,
+    tokenHash: refreshToken,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  });
+
+  return { user, accessToken, refreshToken };
+};
+
 class AuthService {
   async register(inputData: IRegisterData) {
     const { firstName, lastName, email, password: userPassword } = inputData;
@@ -27,24 +46,11 @@ class AuthService {
       password: userPassword,
     });
 
-    const accessToken = generateAccessToken({
-      userId: newUser._id,
-      role: newUser.role,
-    });
-    const refreshToken = generateRefreshToken({
-      userId: newUser._id,
-      role: newUser.role,
-    });
+    const { user, accessToken, refreshToken } =
+      await generateUserSession(newUser);
+    const { password, ...userData } = user.toObject();
 
-    await RefreshToken.create({
-      userId: newUser._id,
-      tokenHash: refreshToken,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    });
-
-    const { password, ...user } = newUser.toObject();
-
-    return { user, refreshToken, accessToken };
+    return { user: userData, refreshToken, accessToken };
   }
 
   async login(inputData: ILoginData) {
@@ -58,24 +64,12 @@ class AuthService {
       throw new AppError('Invalid email or password', 400);
     }
 
-    const accessToken = generateAccessToken({
-      userId: currentUser._id,
-      role: currentUser.role,
-    });
-    const refreshToken = generateRefreshToken({
-      userId: currentUser._id,
-      role: currentUser.role,
-    });
+    const { user, accessToken, refreshToken } =
+      await generateUserSession(currentUser);
 
-    await RefreshToken.create({
-      userId: currentUser._id,
-      tokenHash: refreshToken,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    });
+    const { password, ...userData } = user.toObject();
 
-    const { password, ...user } = currentUser.toObject();
-
-    return { user, accessToken, refreshToken };
+    return { user: userData, accessToken, refreshToken };
   }
 }
 
