@@ -1,9 +1,9 @@
-import { Document } from "mongoose";
+import { Document } from 'mongoose';
 
 export enum UserRoles {
-  ADMIN = "admin",
-  CLIENT = "client",
-  FREELANCER = "freelancer"
+  ADMIN = 'admin',
+  CLIENT = 'client',
+  FREELANCER = 'freelancer',
 }
 
 interface IUser extends Document {
@@ -13,7 +13,8 @@ interface IUser extends Document {
   password: string;
   passwordChangedAt?: Date;
   role: UserRoles;
-
+  createdAt: Date;
+  updatedAt: Date;
   // methods
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
