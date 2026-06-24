@@ -17,6 +17,7 @@ interface IUser extends Document {
   updatedAt: Date;
   // methods
   comparePassword(candidatePassword: string): Promise<boolean>;
+  passwordChangedAfterTokenIssued(jwtTimeStamp: number): boolean;
 }
 
 export default IUser;

@@ -68,6 +68,13 @@ class AuthController {
       user,
     );
   }
+
+  async userProfile(req: Request, res: Response, next: NextFunction) {
+    res.status(200).json({
+      success: 'true',
+      message: 'User profile',
+    });
+  }
 }
 
 export default new AuthController();

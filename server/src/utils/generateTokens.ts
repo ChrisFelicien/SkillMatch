@@ -14,7 +14,7 @@ export const generateAccessToken = (payload: IJwtPayload): string => {
 
 export const generateRefreshToken = (payload: IJwtPayload): string => {
   return jwt.sign(
-    { user: payload.userId, role: payload.role },
+    { user: payload.userId, role: payload.role, jwt: crypto.randomUUID() },
     config.JWT_REFRESH_TOKEN_SECRET,
     {
       expiresIn: '7d',

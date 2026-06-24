@@ -21,8 +21,6 @@ const RefreshTokenSchema = new mongoose.Schema<IRefreshToken>(
   { timestamps: true },
 );
 
-RefreshTokenSchema.index({ userId: 1, tokenHash: 1 }, { unique: true });
-
 RefreshTokenSchema.pre('save', function () {
   if (!this.isModified('tokenHash')) return;
   this.tokenHash = crypto
@@ -32,6 +30,8 @@ RefreshTokenSchema.pre('save', function () {
 
   return;
 });
+
+RefreshTokenSchema.index({ userId: 1, tokenHash: 1 }, { unique: true });
 
 RefreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
