@@ -1,9 +1,16 @@
-import app from "@/app";
-import config from "@/config/env.config";
-import { UserRoles } from "./interfaces/IUser";
+import app from '@/app';
+import config from '@/config/env.config';
+import connectDatabase from '@/config/database';
 
 const PORT = config.PORT;
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+const startServer = async () => {
+  try {
+    await connectDatabase();
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  } catch (error) {}
+};
+
+startServer();
