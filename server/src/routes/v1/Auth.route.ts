@@ -17,4 +17,6 @@ router.post(
   catchAsyncError(AuthController.login),
 );
 
+router.get('/me', AuthController.userProfile);
+
 export default router;
