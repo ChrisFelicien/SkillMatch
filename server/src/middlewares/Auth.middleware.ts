@@ -1,6 +1,6 @@
 import config from '@/config/env.config';
 import { IJwtPayload } from '@/interfaces/IJwtPayLoad';
-import { UserRoles } from '@/interfaces/IUser';
+import IUser, { UserRoles } from '@/interfaces/IUser';
 import User from '@/models/User.model';
 import AppError from '@/utils/AppError';
 import { NextFunction, Request, Response } from 'express';

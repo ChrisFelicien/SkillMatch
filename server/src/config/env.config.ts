@@ -18,6 +18,8 @@ const envSchema = z.object({
   JWT_REFRESH_TOKEN_SECRET: z
     .string('Jwt refresh token secret is missing in env')
     .min(1, 'JWT_REFRESH_TOKEN_SECRET cannot be empty'),
+
+  MONGO_URI: z.string().min(1, 'MONGO_URI is not defined'),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -33,6 +35,7 @@ const config = {
   NODE_ENV: parsed.data.NODE_ENV,
   JWT_REFRESH_TOKEN_SECRET: parsed.data.JWT_REFRESH_TOKEN_SECRET,
   JWT_ACCESS_TOKEN_SECRET: parsed.data.JWT_ACCESS_TOKEN_SECRET,
+  MONGO_URI: parsed.data.MONGO_URI,
 };
 
 export default config;
