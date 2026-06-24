@@ -1,4 +1,5 @@
 import AuthController from '@/controllers/Auth.controller';
+import AuthMiddleware from '@/middlewares/Auth.middleware';
 import validate from '@/middlewares/validate';
 import { loginSchema, registerSchema } from '@/schemas/AuthSchema';
 import catchAsyncError from '@/utils/catchAsyncError';
@@ -17,6 +18,10 @@ router.post(
   catchAsyncError(AuthController.login),
 );
 
-router.get('/me', AuthController.userProfile);
+router.get(
+  '/me',
+  catchAsyncError(AuthMiddleware.protect),
+  AuthController.userProfile,
+);
 
 export default router;
