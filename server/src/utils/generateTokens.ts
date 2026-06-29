@@ -4,7 +4,7 @@ import * as jwt from 'jsonwebtoken';
 
 export const generateAccessToken = (payload: IJwtPayload): string => {
   return jwt.sign(
-    { user: payload.userId, role: payload.role },
+    { userId: payload.userId, role: payload.role },
     config.JWT_ACCESS_TOKEN_SECRET,
     {
       expiresIn: '15m',
@@ -14,7 +14,7 @@ export const generateAccessToken = (payload: IJwtPayload): string => {
 
 export const generateRefreshToken = (payload: IJwtPayload): string => {
   return jwt.sign(
-    { user: payload.userId, role: payload.role, jwt: crypto.randomUUID() },
+    { userId: payload.userId, role: payload.role, jwt: crypto.randomUUID() },
     config.JWT_REFRESH_TOKEN_SECRET,
     {
       expiresIn: '7d',

@@ -3,9 +3,13 @@ import * as z from 'zod';
 export const registerSchema = z.object({
   body: z
     .object({
-      firstName: z.string('User first name is required'),
-      lastName: z.string('User last name is required'),
-      email: z.email('Please provide valid email'),
+      firstName: z
+        .string('User first name is required')
+        .min(3, 'First name must contain at least 3 characters'),
+      lastName: z
+        .string('User last name is required')
+        .min(3, 'Last name must contain at least 3 characters'),
+      email: z.string('Email is required').email('Please provide valid email'),
       password: z
         .string('Please provide user password')
         .min(8, 'Password must be at least 8 characters long')
@@ -25,7 +29,7 @@ export const registerSchema = z.object({
 
 export const loginSchema = z.object({
   body: z.object({
-    email: z.email('Email is required'),
+    email: z.string('Email is required').email('Please provide valid email'),
     password: z.string('Password is required').min(1, 'Password is required'),
   }),
 });
