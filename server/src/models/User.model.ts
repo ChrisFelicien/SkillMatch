@@ -11,12 +11,14 @@ const UserSchema = new mongoose.Schema<IUser>(
       required: [true, 'Provide a first name'],
       minlength: [3, 'First name must have at least 3 characters'],
       maxLength: [30, 'Name cannot exceed 30 characters'],
+      validate: [validator.isAlpha, 'Fist name should be only letters'],
     },
     lastName: {
       type: String,
       required: [true, 'Provide a first name'],
       minlength: [3, 'First name must have at least 3 characters'],
       maxLength: [30, 'Name cannot exceed 30 characters'],
+      validate: [validator.isAlpha, 'Last name should be only letters'],
     },
     email: {
       type: String,
@@ -44,6 +46,9 @@ const UserSchema = new mongoose.Schema<IUser>(
 );
 
 // hash password
+UserSchema.virtual('fullName').get(function (): string {
+  return `${this.firstName} ${this.lastName}`;
+});
 
 UserSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
