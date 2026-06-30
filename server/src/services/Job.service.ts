@@ -42,6 +42,12 @@ class JobService {
     };
   }
 
+  async getAllJobs() {
+    const jobs = await Job.find();
+
+    return { result: jobs.length, message: 'All jobs', jobs };
+  }
+
   async updateJob(
     userId: Types.ObjectId,
     jobId: string,
@@ -63,6 +69,7 @@ class JobService {
     await currentJob.save();
 
     return {
+      message: 'Job updated',
       job: currentJob,
     };
   }

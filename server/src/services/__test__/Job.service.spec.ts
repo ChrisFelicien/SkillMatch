@@ -1,7 +1,6 @@
 import { connect, clearDatabase, closeDatabase } from '@/test/dbHandler';
 import userFactory from '@/test/factory/UserFactory';
 import jobFactory from '@/test/factory/JobFactory';
-import User from '@/models/User.model';
 import JobService from '@/services/Job.service';
 import mongoose from 'mongoose';
 
@@ -111,5 +110,18 @@ describe('Test job service', () => {
     );
 
     expect(result.job.title).toBe('New job title');
+  });
+
+  it('Should get all jobs', async () => {
+    const newId1 = new mongoose.Types.ObjectId();
+
+    const jobData = jobFactory();
+    const { job } = await JobService.createJob(newId1, jobData);
+
+    const result = await JobService.getAllJobs();
+
+    expect(result.message).toBe('All jobs');
+    expect(result.result).toBe(1);
+    expect(result.jobs).toHaveLength(1);
   });
 });
