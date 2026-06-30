@@ -1,10 +1,10 @@
 import IJob from '@/interfaces/IJob';
 import Job from '@/models/Job.model';
 import AppError from '@/utils/AppError';
-import mongoose from 'mongoose';
+import { Types } from 'mongoose';
 
 class JobService {
-  async createJob(clientId: mongoose.Schema.Types.ObjectId, jobData: IJob) {
+  async createJob(clientId: Types.ObjectId, jobData: IJob) {
     const newJob = await Job.create({ ...jobData, client: clientId });
 
     return {
@@ -13,7 +13,7 @@ class JobService {
     };
   }
 
-  async deleteJob(clientId: mongoose.Schema.Types.ObjectId, jobId: string) {
+  async deleteJob(clientId: Types.ObjectId, jobId: string) {
     // first get the current job
     const job = await Job.findById(jobId);
 
@@ -43,7 +43,7 @@ class JobService {
   }
 
   async updateJob(
-    userId: mongoose.Schema.Types.ObjectId,
+    userId: Types.ObjectId,
     jobId: string,
     jobData: Partial<IJob>,
   ) {
