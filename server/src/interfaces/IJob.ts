@@ -1,6 +1,6 @@
 import { Document, Types } from 'mongoose';
 
-enum JobEmploymentType {
+export enum JobEmploymentType {
   FULL_TIME = 'full-time',
   PART_TIME = 'part-time',
   CONTRACT = 'contract',
@@ -8,16 +8,28 @@ enum JobEmploymentType {
   FREELANCE = 'freelance',
 }
 
-enum JobExperienceLevel {
+export enum JobExperienceLevel {
   JUNIOR = 'junior',
   MID = 'mid',
   SENIOR = 'senior',
   LEAD = 'lead',
 }
 
-enum JobStatus {
+export enum JobStatus {
   OPEN = 'open',
   CLOSED = 'closed',
+}
+
+export enum JobLocationType {
+  REMOTE = 'remote',
+  HYBRID = 'hybrid',
+  ONSITE = 'onsite',
+}
+
+export interface ISalary {
+  min: number;
+  max: number;
+  currency: string;
 }
 
 interface IJob extends Document {
@@ -25,12 +37,9 @@ interface IJob extends Document {
   description: string;
   company: string;
   location: string;
+  jobLocationType: JobLocationType;
   employmentType: JobEmploymentType;
-  salary: {
-    min: number;
-    max: number;
-    currency: string;
-  };
+  salary: ISalary;
   skills: string[];
   experienceLevel: JobExperienceLevel;
   status: JobStatus;
