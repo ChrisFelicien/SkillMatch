@@ -32,6 +32,7 @@ const UserSchema = new mongoose.Schema<IUser>(
       required: [true, 'User must have a password'],
       select: false,
     },
+
     role: {
       type: String,
       enum: Object.values(UserRoles),
