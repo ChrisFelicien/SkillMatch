@@ -2,7 +2,6 @@ import { connect, clearDatabase, closeDatabase } from '@/test/dbHandler';
 import userFactory from '@/test/factory/UserFactory';
 import AuthService from '@/services/Auth.service';
 import User from '@/models/User.model';
-import AppError from '@/utils/AppError';
 
 const jwtRegex = /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+$/;
 
