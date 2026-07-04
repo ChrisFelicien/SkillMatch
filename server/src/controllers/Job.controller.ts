@@ -10,6 +10,7 @@ class JobController {
     if (!clientId) {
       return next(new AppError('Client id is required', 400));
     }
+
     const { message, job } = await JobService.createJob(clientId, jobData);
 
     return res.status(201).json({
@@ -39,7 +40,7 @@ class JobController {
     const jobId = req.params.jobId;
 
     if (!jobId || typeof jobId !== 'string') {
-      throw new AppError('Job id is required and must be a string', 400);
+      return next(new AppError('Job id is required and must be a string', 400));
     }
 
     const result = await JobService.getSingleJob(jobId);
