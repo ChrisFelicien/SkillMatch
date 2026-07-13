@@ -711,6 +711,31 @@ describe('Test job controller case get all jobs', () => {
 });
 
 describe('Test job controller case delete a job', () => {
+  it('Should fail to delete when the send id is not correct', async () => {
+    const agent = request.agent(app);
+
+    const userData = userFactory();
+
+    const response = await agent
+      .post('/api/v1/auth/register')
+      .send({ ...userData, confirmPassword: userData.password });
+
+    await User.findByIdAndUpdate(response.body.user._id, {
+      role: UserRoles.CLIENT,
+    });
+
+    const jobData = jobFactory();
+
+    await Job.create({
+      ...jobData,
+      client: response.body.user._id,
+    });
+
+    const result = await agent.delete(`/api/v1/jobs/invalid-id-format`);
+    expect(result.statusCode).toBe(400);
+    expect(result.body.message).toBe('Invalid _id: invalid-id-format');
+  });
+
   it('Should not delete a job when we are not authenticated', async () => {
     const id = new mongoose.Types.ObjectId();
     const response = await request(app).delete(`/api/v1/jobs/${id}`);
@@ -785,8 +810,10 @@ describe('Test job controller case delete a job', () => {
     });
 
     const result = await agent.delete(`/api/v1/jobs/${job._id}`);
+    const deletedJob = await Job.findById(job._id);
 
     expect(result.statusCode).toBe(204);
+    expect(deletedJob).toBeNull();
   });
 });
 
@@ -868,6 +895,37 @@ describe('Test job controller case updata a job', () => {
       .patch(`/api/v1/jobs/${job._id}`)
       .send({ title: 'New job title' });
 
+    const updatedJob = await Job.findById(job._id);
+
     expect(result.statusCode).toBe(200);
+    expect(updatedJob?.title).toBe('New job title');
+  });
+
+  it('Should fail to update when the send id is not correct', async () => {
+    const agent = request.agent(app);
+
+    const userData = userFactory();
+
+    const response = await agent
+      .post('/api/v1/auth/register')
+      .send({ ...userData, confirmPassword: userData.password });
+
+    await User.findByIdAndUpdate(response.body.user._id, {
+      role: UserRoles.CLIENT,
+    });
+
+    const jobData = jobFactory();
+
+    await Job.create({
+      ...jobData,
+      client: response.body.user._id,
+    });
+
+    const result = await agent
+      .patch(`/api/v1/jobs/invalid-id-format`)
+      .send({ title: 'New job title' });
+
+    expect(result.statusCode).toBe(400);
+    expect(result.body.message).toBe('Invalid _id: invalid-id-format');
   });
 });
