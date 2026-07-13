@@ -3,6 +3,8 @@ import JobController from '@/controllers/Job.controller';
 import AuthMiddleware from '@/middlewares/Auth.middleware';
 import { UserRoles } from '@/interfaces/IUser';
 import catchAsyncError from '@/utils/catchAsyncError';
+import validate from '@/middlewares/validate';
+import { createJobSchema } from '@/schemas/JobSchema';
 
 const router: Router = Router();
 
@@ -12,7 +14,7 @@ router
   .post(
     AuthMiddleware.protect,
     AuthMiddleware.restrictTo([UserRoles.CLIENT, UserRoles.ADMIN]),
-    // will add zod
+    validate(createJobSchema),
     catchAsyncError(JobController.createJob),
   );
 router
