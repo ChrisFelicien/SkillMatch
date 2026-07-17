@@ -1,25 +1,30 @@
-import { CompanyStatus, ICompany } from '@/interfaces/ICompany';
+import {
+  CompanyStatus,
+  ICompany,
+  ICreateCompanyDto,
+} from '@/interfaces/ICompany';
 import { UserRoles } from '@/interfaces/IUser';
 import Company from '@/models/Company.model';
 import User from '@/models/User.model';
 import AppError from '@/utils/AppError';
+import { Types } from 'mongoose';
 
 class CompanyService {
-  async submitClientRequest(data: ICompany) {
-    if (!data.owner || !data.name) {
-      throw new AppError('Please provide owner id and company name', 400);
-    }
+  async submitClientRequest(owner: Types.ObjectId, data: ICreateCompanyDto) {
+    if (!owner) throw new AppError('Please provide owner id', 400);
+    if (!data.name) throw new AppError('Please provide company name', 400);
 
-    const existingRequest = await Company.findOne({ owner: data.owner });
+    const existingRequest = await Company.findOne({ owner });
 
     if (existingRequest) {
       throw new AppError('You already submitted a request.', 400);
     }
 
-    await Company.create(data);
+    const request = await Company.create({ owner, ...data });
 
     return {
       message: 'Request sent.',
+      request,
     };
   }
 
@@ -57,13 +62,13 @@ class CompanyService {
       throw new AppError('This request has been processed', 400);
     }
 
-    request.status = CompanyStatus.APPROVED;
-
     const currentUser = await User.findById(request.owner);
 
     if (!currentUser) {
       throw new AppError('No user find.', 404);
     }
+
+    request.status = CompanyStatus.APPROVED;
     currentUser.role = UserRoles.CLIENT;
 
     await Promise.all([currentUser.save(), request.save()]);

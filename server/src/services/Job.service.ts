@@ -26,6 +26,8 @@ class JobService {
       throw new AppError('Sorry you are not allowed to delete this job', 401);
     }
 
+    await Job.findByIdAndDelete(job._id);
+
     return {
       message: 'Job deleted',
     };
