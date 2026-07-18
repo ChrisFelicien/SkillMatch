@@ -19,3 +19,11 @@ export interface ICompany {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface ICreateCompanyDto {
+  name: string;
+  description?: string;
+  website?: string;
+  logo?: string;
+  industry?: string;
+}
