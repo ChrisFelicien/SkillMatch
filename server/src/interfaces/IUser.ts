@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export enum UserRoles {
   ADMIN = 'admin',
@@ -15,6 +15,7 @@ interface IUser extends Document {
   role: UserRoles;
   createdAt: Date;
   updatedAt: Date;
+  company?: Types.ObjectId;
   // methods
   comparePassword(candidatePassword: string): Promise<boolean>;
   passwordChangedAfterTokenIssued(jwtTimeStamp: number): boolean;
