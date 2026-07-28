@@ -21,7 +21,7 @@ class AuthMiddleware {
     const accessToken = req.cookies?.accessToken;
 
     if (!accessToken) {
-      throw new AppError('No access provided.', 401);
+      throw new AppError('No access provided', 401);
     }
 
     const decoded = jwt.verify(accessToken, config.JWT_ACCESS_TOKEN_SECRET);
@@ -60,6 +60,7 @@ class AuthMiddleware {
       if (!req.user) {
         return next(new AppError('You are not authenticated.', 401));
       }
+
       if (!roles.includes(req.user.role)) {
         return next(
           new AppError('You are not allowed to perform this action', 403),

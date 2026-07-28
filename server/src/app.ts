@@ -1,5 +1,7 @@
 import express, { Express, NextFunction, Request, Response } from 'express';
-import authRouter from '@/routes/v1/Auth.route';
+import authRoutes from '@/routes/v1/Auth.route';
+import jobRoutes from '@/routes/v1/Job.route';
+import clientRoutes from '@/routes/v1/Client.route';
 import AppError from './utils/AppError';
 import globalErrorHandler from '@/middlewares/globalErrorHandler';
 import cookieParser from 'cookie-parser';
@@ -11,7 +13,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // routes
-app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/jobs', jobRoutes);
+app.use('/api/v1/companies', clientRoutes);
 app.use('/api/v1/health', (req: Request, res: Response, next: NextFunction) => {
   res.status(200).json({
     status: 'Ok',

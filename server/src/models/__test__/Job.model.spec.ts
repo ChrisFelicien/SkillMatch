@@ -3,7 +3,7 @@ import Job from '@/models/Job.model';
 import User from '@/models/User.model';
 import userFactory from '@/test/factory/UserFactory';
 import jobFactory from '@/test/factory/JobFactory';
-import IJob from '@/interfaces/IJob';
+import { JobEmploymentType, JobStatus } from '@/interfaces/IJob';
 
 beforeAll(async () => {
   await connect();
@@ -149,5 +149,29 @@ describe('Test job model', () => {
     await expect(Job.create(jobData)).rejects.toThrow(
       'Job must contain between 1 and 20 skills',
     );
+  });
+  it('should default status to open', async () => {
+    const user = await User.create(userFactory());
+    const jobData = jobFactory({ client: user._id });
+    const job = await Job.create(jobData);
+
+    expect(job.status).toBe(JobStatus.OPEN);
+  });
+
+  it('should default employmentType to full-time', async () => {
+    const user = await User.create(userFactory());
+    const jobData = jobFactory({ client: user._id });
+    const job = await Job.create(jobData);
+
+    expect(job.employmentType).toBe(JobEmploymentType.FULL_TIME);
+  });
+
+  it('should create createdAt and updatedAt', async () => {
+    const user = await User.create(userFactory());
+    const jobData = jobFactory({ client: user._id });
+    const job = await Job.create(jobData);
+
+    expect(job.createdAt).toBeDefined();
+    expect(job.updatedAt).toBeDefined();
   });
 });

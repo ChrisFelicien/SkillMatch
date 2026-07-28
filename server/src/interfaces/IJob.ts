@@ -1,4 +1,4 @@
-import { Document, Types } from 'mongoose';
+import mongoose, { Document, Types } from 'mongoose';
 
 export enum JobEmploymentType {
   FULL_TIME = 'full-time',
@@ -32,7 +32,7 @@ export interface ISalary {
   currency: string;
 }
 
-interface IJob extends Document {
+interface IJob {
   title: string;
   description: string;
   company: string;

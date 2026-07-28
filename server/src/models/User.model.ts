@@ -36,8 +36,9 @@ const UserSchema = new mongoose.Schema<IUser>(
     role: {
       type: String,
       enum: Object.values(UserRoles),
-      default: UserRoles.CLIENT,
+      default: UserRoles.FREELANCER,
     },
+    company: mongoose.Types.ObjectId,
   },
   {
     timestamps: true,
