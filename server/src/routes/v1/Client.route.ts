@@ -2,6 +2,8 @@ import { Router } from 'express';
 import AuthMiddleware from '@/middlewares/Auth.middleware';
 import { UserRoles } from '@/interfaces/IUser';
 import CompanyController from '@/controllers/Company.controller';
+import validate from '@/middlewares/validate';
+import { clientSchema } from '@/schemas/ClientSchema';
 
 const router: Router = Router();
 
@@ -10,6 +12,7 @@ router
   .post(
     AuthMiddleware.protect,
     AuthMiddleware.restrictTo([UserRoles.FREELANCER]),
+    validate(clientSchema),
     CompanyController.submitClientRequest,
   )
   .get(
@@ -26,14 +29,14 @@ router.get(
 );
 
 router.patch(
-  '/companies/:requestId/approve',
+  '/:requestId/approve',
   AuthMiddleware.protect,
   AuthMiddleware.restrictTo([UserRoles.ADMIN]),
   CompanyController.approveClientRequest,
 );
 
 router.patch(
-  '/companies/:requestId/reject',
+  '/:requestId/reject',
   AuthMiddleware.protect,
   AuthMiddleware.restrictTo([UserRoles.ADMIN]),
   CompanyController.rejectClientRequest,
