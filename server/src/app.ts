@@ -15,7 +15,7 @@ app.use(cookieParser());
 // routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/jobs', jobRoutes);
-app.use('/client-request', clientRoutes);
+app.use('/api/v1/companies', clientRoutes);
 app.use('/api/v1/health', (req: Request, res: Response, next: NextFunction) => {
   res.status(200).json({
     status: 'Ok',
