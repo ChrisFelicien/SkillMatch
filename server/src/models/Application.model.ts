@@ -21,15 +21,18 @@ const ApplicationSchema = new mongoose.Schema<IApplication>(
     coverLetter: {
       type: String,
       required: [true, 'Please provide the cover letter'],
+      trim: true,
     },
     resume: {
       type: String,
       required: [true, 'Please provide the resume'],
+      trim: true,
     },
     status: {
       type: String,
       enum: Object.values(ApplicationStatus),
       default: ApplicationStatus.PENDING,
+      trim: true,
     },
   },
   { timestamps: true },
