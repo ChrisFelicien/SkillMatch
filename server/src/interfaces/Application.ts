@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 
-enum ApplicationStatus {
+export enum ApplicationStatus {
   PENDING = 'pending',
   REVIEWING = 'reviewing',
   INTERVIEW = 'interview',
@@ -8,7 +8,7 @@ enum ApplicationStatus {
   REJECTED = 'rejected',
 }
 
-interface Application {
+interface IApplication {
   freelancer: Types.ObjectId;
   job: Types.ObjectId;
   company: Types.ObjectId;
@@ -19,4 +19,4 @@ interface Application {
   updatedAt: Date;
 }
 
-export default Application;
+export default IApplication;
