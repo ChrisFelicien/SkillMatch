@@ -2,7 +2,7 @@ import { connect, clearDatabase, closeDatabase } from '@/test/dbHandler';
 import mongoose, { Types } from 'mongoose';
 import Application from '@/models/Application.model';
 import applicationFactory from '@/test/factory/ApplicationFactory';
-import { ApplicationStatus } from '@/interfaces/Application';
+import { ApplicationStatus } from '@/interfaces/IApplication';
 
 beforeAll(async () => {
   await connect();
@@ -27,7 +27,7 @@ describe('Test Application model', () => {
     expect(result.updatedAt).toBeDefined();
   });
 
-  it('Should fail when freelancer already applied', async () => {
+  it('Should enforce unique freelancer and job application', async () => {
     const applicationData = applicationFactory();
     await Application.create(applicationData);
 

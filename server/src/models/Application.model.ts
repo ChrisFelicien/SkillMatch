@@ -1,4 +1,4 @@
-import IApplication, { ApplicationStatus } from '@/interfaces/Application';
+import IApplication, { ApplicationStatus } from '@/interfaces/IApplication';
 import mongoose from 'mongoose';
 
 const ApplicationSchema = new mongoose.Schema<IApplication>(
