@@ -8,9 +8,14 @@ import AppError from '@/utils/AppError';
 
 class ApplicationService {
   async applyToJob(data: ApplyToJobDTO) {
+    const { freelancer, job, company, coverLetter, resume } = data;
+
+    if (!freelancer || !job || !company || !coverLetter || !resume) {
+      throw new AppError('Missing required field', 400);
+    }
     // 1. Be sure the job and company exist
-    const jobExist = await Job.findById(data.job);
-    const companyExist = await Company.findById(data.company);
+    const jobExist = await Job.findById(job);
+    const companyExist = await Company.findById(company);
 
     if (!jobExist || !companyExist) {
       throw new AppError('Sorry, Company or job not found.', 404);
@@ -20,12 +25,12 @@ class ApplicationService {
     if (jobExist.status !== JobStatus.OPEN) {
       throw new AppError('Sorry, application for this position is closed', 400);
     }
-    const freelancer = await User.findById(data.freelancer);
+    const freelancerExist = await User.findById(freelancer);
 
-    if (!freelancer) throw new AppError('Freelancer not found', 404);
+    if (!freelancerExist) throw new AppError('Freelancer not found', 404);
 
     // 5. check if the job belong to the company
-    if (!jobExist.client.equals(data.company)) {
+    if (!jobExist.client.equals(company)) {
       throw new AppError(
         'This job does not belong to the specified company.',
         400,
@@ -34,25 +39,20 @@ class ApplicationService {
 
     // 6. check if user has already applied
     const alreadyApplied = await Application.findOne({
-      freelancer: data.freelancer,
-      job: data.job,
+      freelancer,
+      job,
     });
 
     if (alreadyApplied) {
       throw new AppError('You have already applied to this position', 400);
     }
 
-    // 4. Check if covert letter or resume doesn't exist (will be link)
-    if (!data.coverLetter || !data.resume) {
-      throw new AppError('Please provide the cover letter and the resume', 400);
-    }
-
     const application = await Application.create({
-      freelancer: data.freelancer,
-      job: data.job,
-      company: data.company,
-      resume: data.resume,
-      coverLetter: data.coverLetter,
+      freelancer,
+      job,
+      company,
+      resume,
+      coverLetter,
     });
 
     return {
