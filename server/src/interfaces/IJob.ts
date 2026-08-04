@@ -1,4 +1,4 @@
-import mongoose, { Document, Types } from 'mongoose';
+import { Types } from 'mongoose';
 
 export enum JobEmploymentType {
   FULL_TIME = 'full-time',
