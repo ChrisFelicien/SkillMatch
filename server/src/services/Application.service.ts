@@ -107,11 +107,37 @@ class ApplicationService {
       applications,
     };
   }
-  getApplicationById() {}
+  async getApplicationById(
+    applicationId: string,
+    currentUserId: Types.ObjectId,
+    currentUserRole: UserRoles,
+  ) {
+    const application = await Application.findById(applicationId);
+
+    if (!application) throw new AppError('No application found.', 404);
+
+    if (currentUserRole !== UserRoles.ADMIN) {
+      const job = await Job.findOne(application.job);
+
+      if (!job) throw new AppError('No job found', 404);
+
+      if (!job.client.equals(currentUserId)) {
+        throw new AppError(
+          'You are not authorized to view this application.',
+          403,
+        );
+      }
+    }
+
+    return {
+      message: 'Single job application',
+      application,
+    };
+  }
   getAllApplications() {}
   updateApplicationStatus() {}
   withdrawApplication() {}
-  deleteApplication() {} //(optionnel, admin)
+  deleteApplication() {} //(optional, admin)
 }
 
 export default new ApplicationService();
