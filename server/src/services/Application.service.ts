@@ -1,10 +1,12 @@
 import { ApplyToJobDTO } from '@/interfaces/IApplication';
 import { JobStatus } from '@/interfaces/IJob';
+import { UserRoles } from '@/interfaces/IUser';
 import Application from '@/models/Application.model';
 import Company from '@/models/Company.model';
 import Job from '@/models/Job.model';
 import User from '@/models/User.model';
 import AppError from '@/utils/AppError';
+import { Types } from 'mongoose';
 
 class ApplicationService {
   async applyToJob(data: ApplyToJobDTO) {
@@ -60,10 +62,53 @@ class ApplicationService {
       application,
     };
   }
-  getAllApplications() {}
+  async getApplicationsByJob(
+    jobId: string,
+    currentUserId: Types.ObjectId,
+    currentUserRole: UserRoles,
+  ) {
+    const job = await Job.findById(jobId);
+
+    if (!job) throw new AppError('No job found.', 404);
+
+    if (
+      !job.client.equals(currentUserId) &&
+      currentUserRole !== UserRoles.ADMIN
+    ) {
+      throw new AppError(
+        'You are not authorized to view these application',
+        403,
+      );
+    }
+
+    const applications = await Application.find({ job: jobId }).sort({
+      createdAt: -1,
+    });
+
+    return {
+      message: 'Applications retrieved successfully',
+      total: applications.length,
+      applications,
+    };
+  }
+  async getMyApplications(jobId: string, currentUserId: Types.ObjectId) {
+    const job = await Job.findById(jobId);
+
+    if (!job) throw new AppError('No job found.', 404);
+
+    const applications = await Application.find({
+      freelancer: currentUserId,
+      job: jobId,
+    }).sort({ createdAt: -1 });
+
+    return {
+      message: 'Applications retrieved successfully',
+      total: applications.length,
+      applications,
+    };
+  }
   getApplicationById() {}
-  getApplicationsByJob() {}
-  getMyApplications() {}
+  getAllApplications() {}
   updateApplicationStatus() {}
   withdrawApplication() {}
   deleteApplication() {} //(optionnel, admin)
