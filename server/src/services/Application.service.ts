@@ -173,8 +173,28 @@ class ApplicationService {
       message: 'application updated',
     };
   }
-  withdrawApplication() {}
-  deleteApplication() {} //(optional, admin)
+  async withdrawApplication(applicationId: string, currentUserId: string) {
+    const application = await Application.findById(applicationId);
+    if (!application) throw new AppError('No application found', 404);
+
+    if (application.freelancer.equals(currentUserId)) {
+      throw new AppError('You are not allowed to perform this action', 403);
+    }
+    if (
+      application.status !== ApplicationStatus.PENDING &&
+      application.status !== ApplicationStatus.REVIEWING
+    ) {
+      throw new AppError('This application cannot be withdrawn.', 400);
+    }
+
+    application.status = ApplicationStatus.WITHDRAWN;
+    await application.save();
+
+    return {
+      message: 'Application withdrawn successfully',
+      application,
+    };
+  }
 }
 
 export default new ApplicationService();

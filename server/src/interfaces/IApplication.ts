@@ -6,6 +6,7 @@ export enum ApplicationStatus {
   INTERVIEW = 'interview',
   ACCEPTED = 'accepted',
   REJECTED = 'rejected',
+  WITHDRAWN = 'withdraw',
 }
 
 interface IApplication {
