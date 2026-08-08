@@ -1,4 +1,4 @@
-import { ApplyToJobDTO } from '@/interfaces/IApplication';
+import { ApplicationStatus, ApplyToJobDTO } from '@/interfaces/IApplication';
 import { JobStatus } from '@/interfaces/IJob';
 import { UserRoles } from '@/interfaces/IUser';
 import Application from '@/models/Application.model';
@@ -134,8 +134,45 @@ class ApplicationService {
       application,
     };
   }
-  getAllApplications() {}
-  updateApplicationStatus() {}
+  async getAllApplications() {
+    const applications = await Application.find();
+
+    return {
+      message: 'All applications list',
+      applications,
+    };
+  }
+  async updateApplicationStatus(
+    applicationId: string,
+    status: ApplicationStatus,
+    currentUserId: Types.ObjectId,
+    // currentUserRole: UserRoles,
+  ) {
+    const application = await Application.findById(applicationId);
+    if (!application) throw new AppError('No application found.', 404);
+
+    const job = await Job.findById(application.job);
+
+    if (!job) throw new AppError('No job found.', 404);
+
+    if (!job.client.equals(currentUserId)) {
+      throw new AppError(
+        'You are not authorized to view this application.',
+        403,
+      );
+    }
+
+    if (application.status === status) {
+      throw new AppError('Application already has this status.', 400);
+    }
+
+    application.status = status;
+    await application.save();
+
+    return {
+      message: 'application updated',
+    };
+  }
   withdrawApplication() {}
   deleteApplication() {} //(optional, admin)
 }
